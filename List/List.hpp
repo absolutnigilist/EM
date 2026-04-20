@@ -37,6 +37,12 @@ public:
 	//---Метод вставки элемента после указанного узла
 	ListNode* insertAfter(ListNode* node, const std::string& data);
 
+	//---Метод вставки элемента перед указанным узлом
+	ListNode* insertBefore(ListNode* node, const std::string& data);
+
+	//---Метод удаления указанного узла
+	void erase(ListNode* node);
+
 	//---Метод получения указателя на элемент по индексу
 	ListNode* getNodeAt(std::size_t index) const;
 

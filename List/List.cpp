@@ -149,6 +149,88 @@ ListNode* List::insertAfter(ListNode* node, const std::string& data) {
 	return newNode;
 }
 //------------------------------------------------
+//	Метод вставки элемента перед указанным узлом
+//------------------------------------------------
+ListNode* List::insertBefore(ListNode* node, const std::string& data) {
+
+	//---Создаём новый узел
+	ListNode* newNode = new ListNode();
+	newNode->data = data;
+	newNode->rand = nullptr;
+
+	//---Если node не равен nullptr, вставляем новый узел перед node
+	if (node != nullptr)
+	{
+		//---Вставка перед node
+		newNode->next = node;
+		newNode->prev = node->prev;
+
+		if (node->prev != nullptr)
+		{
+			node->prev->next = newNode;
+		}
+		else
+		{
+			head = newNode;
+		}
+		node->prev = newNode;
+	}
+	else
+	{
+		//---Если node равен nullptr, вставляем новый узел в конец списка
+		newNode->next = nullptr;
+		newNode->prev = tail;
+
+		if (tail != nullptr)
+		{
+			tail->next = newNode;
+		}
+		else
+		{
+			head = newNode;
+		}
+		tail = newNode;
+	}
+	
+	++count;
+	return newNode;
+}
+//------------------------------------------------
+//    Метод для удаления указанного узла
+//------------------------------------------------
+void List::erase(ListNode* node) {
+	
+	//---Если node равен nullptr, ничего не удаляем
+	if (node == nullptr) return;
+
+
+	if (node->prev != nullptr)
+	{
+		//---Узел не является началом списка, обновляем указатель next предыдущего узла
+		node->prev->next = node->next;
+	}
+	else
+	{
+		//---Узел является началом списка, обновляем указатель head
+		head = node->next;
+	}
+
+	if (node->next != nullptr)
+	{
+		//---Узел не является концом списка, обновляем указатель prev следующего узла
+		node->next->prev = node->prev;
+	}
+	else
+	{
+		//---Узел является концом списка, обновляем указатель tail
+		tail = node->prev;
+	}
+
+	//---Удаляем узел и уменьшаем количество элементов в списке
+	delete node;
+	--count;
+}
+//------------------------------------------------
 //	Метод получения указателя на элемент по индексу
 //------------------------------------------------
 ListNode* getNodeAt(std::size_t index) const {
