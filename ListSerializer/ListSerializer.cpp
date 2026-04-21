@@ -77,13 +77,17 @@ namespace {
 void ListSerializer::loadFromFile(List& list, const std::string& fileName) {
 
 	//---Лямбда: удаляет символ '\r' в конце строки (для Windows-совместимости)
-	auto removeCRLF = [](std::string str)->std::string {
-		if (!str.empty() && str.back() == '\r')
-		{
-			str.pop_back();
+	auto trimSpaces = [](std::string str) -> std::string {
+		const char* whitespace = " \t\r\n";
+
+		const std::size_t begin = str.find_first_not_of(whitespace);
+		if (begin == std::string::npos) {
+			return "";
 		}
-		return str;
-	};
+
+		const std::size_t end = str.find_last_not_of(whitespace);
+		return str.substr(begin, end - begin + 1);
+		};
 
 	list.clear();	//	Очищаем список перед загрузкой
 
@@ -110,7 +114,7 @@ void ListSerializer::loadFromFile(List& list, const std::string& fileName) {
 		{
 			++lineNumber;
 			
-			line = removeCRLF(line);	// Нормализуем конец строки
+			line = trimSpaces(line);	// Нормализуем конец строки
 
 			//---Ищем разделитель ';' с конца (data может содержать ';')
 			const std::size_t pos = line.rfind(';');
@@ -123,7 +127,7 @@ void ListSerializer::loadFromFile(List& list, const std::string& fileName) {
 			
 			//---Извлекаем data и rand_index
 			const std::string data = line.substr(0, pos);
-			const std::string randIndexStr = line.substr(pos + 1);
+			const std::string randIndexStr = trimSpaces(line.substr(pos + 1));
 
 			//---Валидация данных
 			if (data.size() > List::kMaxDataSize)
