@@ -1,10 +1,9 @@
 ﻿cmake_minimum_required(VERSION 3.18)
 
-# Включение горячей перезагрузки для компиляторов MSVC, если поддерживается
 if(POLICY CMP0141)
     cmake_policy(SET CMP0141 NEW)
     set(CMAKE_MSVC_DEBUG_INFORMATION_FORMAT
-        "$<IF:$<AND:$<C_COMPILER_ID:MSVC>,$<CXX_COMPILER_ID:MSVC>>,${CMAKE_MSVC_DEBUG_INFORMATION_FORMAT},${CMAKE_MSVC_DEBUG_INFORMATION_FORMAT}>")
+        "$<$<CONFIG:Debug,RelWithDebInfo>:ProgramDatabase>")
 endif()
 
 project(EM LANGUAGES CXX)
@@ -58,8 +57,8 @@ endif()
 
 # Подсказываем CMake, где искать локальный glog
 if(EXISTS "${LOCAL_GLOG_DIR}/lib/cmake/glog")
-    list(PREPEND CMAKE_PREFIX_PATH "${LOCAL_GLOG_DIR}")
     set(glog_DIR "${LOCAL_GLOG_DIR}/lib/cmake/glog")
+    list(PREPEND CMAKE_PREFIX_PATH "${LOCAL_GLOG_DIR}")
 endif()
 
 # ------------------------------------------------------------
@@ -68,9 +67,23 @@ endif()
 find_package(glog 0.6.0 CONFIG QUIET)
 
 if(NOT TARGET glog::glog)
-    find_package(PkgConfig REQUIRED)
-    pkg_check_modules(GLOG REQUIRED IMPORTED_TARGET libglog)
-    add_library(glog::glog ALIAS PkgConfig::GLOG)
+    if(WIN32)
+        if(EXISTS "${LOCAL_GLOG_DIR}/lib/glog.lib")
+            add_library(glog::glog UNKNOWN IMPORTED)
+            set_target_properties(glog::glog PROPERTIES
+                IMPORTED_LOCATION "${LOCAL_GLOG_DIR}/lib/glog.lib"
+                INTERFACE_INCLUDE_DIRECTORIES "${LOCAL_GLOG_DIR}/include"
+            )
+        else()
+            message(FATAL_ERROR
+                "glog::glog was not found and local Windows library "
+                "${LOCAL_GLOG_DIR}/lib/glog.lib does not exist.")
+        endif()
+    else()
+        find_package(PkgConfig REQUIRED)
+        pkg_check_modules(GLOG REQUIRED IMPORTED_TARGET libglog)
+        add_library(glog::glog ALIAS PkgConfig::GLOG)
+    endif()
 endif()
 
 # ------------------------------------------------------------
@@ -83,8 +96,8 @@ add_subdirectory(ListSerializer)
 # Главный исполняемый файл
 # ------------------------------------------------------------
 add_executable(main
-    main.cpp
-    ListNode.hpp
+    "${CMAKE_SOURCE_DIR}/main.cpp"
+    "${CMAKE_SOURCE_DIR}/ListNode.hpp"
 )
 
 target_link_libraries(main PRIVATE
@@ -94,7 +107,7 @@ target_link_libraries(main PRIVATE
 )
 
 target_include_directories(main PRIVATE
-    ${CMAKE_SOURCE_DIR}
+    "${CMAKE_SOURCE_DIR}"
 )
 
 target_compile_definitions(main PRIVATE

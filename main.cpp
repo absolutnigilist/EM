@@ -3,9 +3,15 @@
 #include "ListSerializer.hpp"
 #include <iostream>
 
+#ifdef _WIN32
+#include <Windows.h>
+#endif
 
 int main(int argc, char** argv) {
 
+#ifdef _WIN32
+	//DebugBreak();
+#endif
 	try
 	{
 		List list;
