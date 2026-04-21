@@ -1,2 +1,10 @@
-cmake_minimum_required(VERSION 3.16)
-project(List LANGUAGES CXX)
+add_library(List
+    List.cpp
+    List.hpp
+    ${CMAKE_SOURCE_DIR}/ListNode.hpp
+)
+
+target_include_directories(List PUBLIC
+    ${CMAKE_CURRENT_SOURCE_DIR}
+    ${CMAKE_SOURCE_DIR}
+)

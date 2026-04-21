@@ -6,7 +6,6 @@
 //------------------------------------------------
 class List
 {
-
 public:
 	//---Максимальное количество узлов в списке
 	static constexpr std::size_t kNodeLimit = 1'000'000;
@@ -19,9 +18,9 @@ public:
 
 	//---Запрещаем копирование и перемещение списка
 	List(const List&) = delete;
-	List& opeartor = (const List&) = delete;
+	List& operator=(const List&) = delete;
 	List(List&&) = delete;
-	List& operator = (List&&) = delete;
+	List& operator=(List&&) = delete;
 
 	//---Метод для очистки списка
 	void clear() noexcept;
@@ -35,7 +34,7 @@ public:
 	ListNode* pushBack(const std::string& data);
 
 	//---Метод добавления элемента в начало списка
-	ListNode* pushBegin(const std::string& data);	
+	ListNode* pushBegin(const std::string& data);
 
 	//---Метод вставки элемента после указанного узла
 	ListNode* insertAfter(ListNode* node, const std::string& data);
@@ -47,11 +46,11 @@ public:
 	void erase(ListNode* node);
 
 	//---Метод получения указателя на элемент по индексу
-	ListNode* getNodeAt(std::size_t index) const;
+	ListNode* getNodeAt(std::size_t index) const noexcept;
 
 private:
-	
+
 	ListNode* head = nullptr;	//	Указатель на начало списка
 	ListNode* tail = nullptr;	//	Указатель на конец списка
 	std::size_t count = 0;		//	Количество элементов в списке
-}
+};

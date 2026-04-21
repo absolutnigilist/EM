@@ -1,11 +1,11 @@
 #include "ListSerializer.hpp"
 #include "List.hpp"
 
-#include <string>
 #include <climits>
 #include <fstream>
 #include <vector>
-#include <stdeсxept>
+#include <stdexcept>
+#include <unordered_map>
 
 namespace {
 	
@@ -74,7 +74,7 @@ namespace {
 //  Читает список из текстового файла
 //  Формат строки: <data>;<rand_index>
 //------------------------------------------------
-void ListSerializer::loadFromTextFile(List& list, const std::string& fileName) {
+void ListSerializer::loadFromFile(List& list, const std::string& fileName) {
 
 	//---Лямбда: удаляет символ '\r' в конце строки (для Windows-совместимости)
 	auto removeCRLF = [](std::string str)->std::string {
@@ -151,14 +151,14 @@ void ListSerializer::loadFromTextFile(List& list, const std::string& fileName) {
 			//---Проверяем, что вся строка распаршена
 			if (parsedCount != randIndexStr.size())
 			{
-				throw std::runtime_error("Invalid index at line" + std::to_string(lineNumber));
+				throw std::runtime_error("Invalid index at line " + std::to_string(lineNumber));
 			}
 			//---Проверяем, что rand-индекс в допустимых пределах
 			if (randIndexLong < -1 || randIndexLong > static_cast<long long>(std::numeric_limits<int>::max()))
 			{
 				throw std::runtime_error("rand index is out of range at line " + std::to_string(lineNumber));
 			}
-			if (list.kMaxDataSize() >= List::kNodeLimit)
+			if (list.getCount() >= List::kNodeLimit)
 			{
 				throw std::runtime_error("Too many nodes is input file: maximum is 1'000'000");
 			}
@@ -199,13 +199,13 @@ void ListSerializer::loadFromTextFile(List& list, const std::string& fileName) {
 //	Метод сериализует список в бинарный файл
 //	Формат: | count (uint64) | для каждого узла: | dataSize (uint32) | data | randIndex (int64) |
 //------------------------------------------------
-static void ListSerializer::serializeBinary(const List& list, const std::string& fileName) {
+void ListSerializer::serializeBinary(const List& list, const std::string& fileName) {
 
 	//---Открываем файл для записи в бинарном режиме
 	std::ofstream out(fileName, std::ios::binary);
 	if (!out.is_open())
 	{
-		throw std::runtime_error("Failed to open output file: " + fileNmae);
+		throw std::runtime_error("Failed to open output file: " + fileName);
 	}
 	//---Собираем узлы списка в вектор для удобства доступа по индексу
 	std::vector<ListNode*> nodes;
@@ -334,17 +334,17 @@ void ListSerializer::deserializeBinary(List& list, const std::string& fileName) 
 		//--- ВТОРОЙ ПРОХОД: восстанавливаем rand-указатели
 		for (std::size_t i = 0; i < nodes.size(); ++i)
 		{
-			const  std::int64_t randIndexc = randIndices[i];
+			const  std::int64_t randIndex = randIndices[i];
 
 			//---Если randIndex == -1, указатель должен быть nullptr
-			if (randIndexc == -1)
+			if (randIndex == -1)
 			{
 				nodes[i]->rand = nullptr;
 				continue;
 			}
 
 			//---Проверяем, что индекс в допустимых пределах
-			if (randIndexc < 0 || randIndexc >= static_cast<std::int64_t>(nodes.size()))
+			if (randIndex < 0 || randIndex >= static_cast<std::int64_t>(nodes.size()))
 			{
 				throw std::runtime_error("rand index out of bounds for binary node " + std::to_string(i));
 			}
