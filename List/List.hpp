@@ -8,7 +8,10 @@ class List
 {
 
 public:
-	
+	//---Максимальное количество узлов в списке
+	static constexpr std::size_t kNodeLimit = 1'000'000;
+	static constexpr std::size_t kMaxDataSize = 1000;
+
 	//---Конструктор по умолчанию: создаёт пустой список
 	List() = default;
 	//----Деструктор: очищает список
@@ -51,5 +54,4 @@ private:
 	ListNode* head = nullptr;	//	Указатель на начало списка
 	ListNode* tail = nullptr;	//	Указатель на конец списка
 	std::size_t count = 0;		//	Количество элементов в списке
-	std::size_t capacity = 6;   //	Емкость списка
 }

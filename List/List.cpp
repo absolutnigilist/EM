@@ -44,6 +44,10 @@ std::size_t List::getCount() const {
 //------------------------------------------------
 ListNode* List::pushBack(const std::string& data) {
 	
+	if (count >= kNodeLimit) {
+		throw std::runtime_error("List size exceeds 1,000,000 nodes");
+	}
+
 	//---Создаём новый узел
 	ListNode* newNode = new ListNode();
 	newNode->data = data;
@@ -73,6 +77,10 @@ ListNode* List::pushBack(const std::string& data) {
 //	Метод добавления элемента в начало списка
 //------------------------------------------------
 ListNode* List::pushBegin(const std::string& data) {
+
+	if (count >= kNodeLimit) {
+		throw std::runtime_error("List size exceeds 1,000,000 nodes");
+	}
 
 	//---Создаём новый узел
 	ListNode* newNode = new ListNode();
@@ -105,6 +113,10 @@ ListNode* List::pushBegin(const std::string& data) {
 //	Метод вставки элемента после указанного узла
 //------------------------------------------------
 ListNode* List::insertAfter(ListNode* node, const std::string& data) {
+
+	if (count >= kNodeLimit) {
+		throw std::runtime_error("List size exceeds 1,000,000 nodes");
+	}
 
 	//---Создаём новый узел
 	ListNode* newNode = new ListNode();
@@ -152,6 +164,10 @@ ListNode* List::insertAfter(ListNode* node, const std::string& data) {
 //	Метод вставки элемента перед указанным узлом
 //------------------------------------------------
 ListNode* List::insertBefore(ListNode* node, const std::string& data) {
+	
+	if (count >= kNodeLimit) {
+		throw std::runtime_error("List size exceeds 1,000,000 nodes");
+	}
 
 	//---Создаём новый узел
 	ListNode* newNode = new ListNode();
