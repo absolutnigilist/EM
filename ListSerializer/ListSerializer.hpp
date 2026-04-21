@@ -6,13 +6,13 @@ class ListSerializer
 {
 public:
 
-	//---Метод чтения списка из текстового файла
+	//---РњРµС‚РѕРґ С‡С‚РµРЅРёСЏ СЃРїРёСЃРєР° РёР· С‚РµРєСЃС‚РѕРІРѕРіРѕ С„Р°Р№Р»Р°
 	static void loadFromFile(List& list, const std::string& fileName);
 
-	//---Метод сериализует список в бинарный файл
+	//---РњРµС‚РѕРґ СЃРµСЂРёР°Р»РёР·СѓРµС‚ СЃРїРёСЃРѕРє РІ Р±РёРЅР°СЂРЅС‹Р№ С„Р°Р№Р»
 	static void serializeBinary(const List& list, const std::string& fileName);
 
-	//---Метод десериализует список из бинарного файла
+	//---РњРµС‚РѕРґ РґРµСЃРµСЂРёР°Р»РёР·СѓРµС‚ СЃРїРёСЃРѕРє РёР· Р±РёРЅР°СЂРЅРѕРіРѕ С„Р°Р№Р»Р°
 	static void deserializeBinary(List& list, const std::string& fileName);
 
 };
