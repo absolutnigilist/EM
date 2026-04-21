@@ -1,11 +1,12 @@
 #include "ListSerializer.hpp"
 #include "List.hpp"
 
-#include <climits>
+#include <limits>
 #include <fstream>
 #include <vector>
 #include <stdexcept>
 #include <unordered_map>
+#include <glog/logging.h>
 
 namespace {
 	
@@ -76,7 +77,7 @@ namespace {
 //------------------------------------------------
 void ListSerializer::loadFromFile(List& list, const std::string& fileName) {
 
-	//---Лямбда: удаляет символ '\r' в конце строки (для Windows-совместимости)
+	//---Лямбда: удаляет символы " \t\r\n" в строке (для Windows-совместимости)
 	auto trimSpaces = [](std::string str) -> std::string {
 		const char* whitespace = " \t\r\n";
 
@@ -95,7 +96,9 @@ void ListSerializer::loadFromFile(List& list, const std::string& fileName) {
 	
 	if (!in.is_open())
 	{
-		throw std::runtime_error("Failed to open file: " + fileName);
+		const std::string msg = "Failed to open file: " + fileName;
+		LOG(ERROR) << msg;
+		throw std::runtime_error(msg);
 	}
 
 	std::vector<ListNode*> nodes;
@@ -122,7 +125,9 @@ void ListSerializer::loadFromFile(List& list, const std::string& fileName) {
 			//---Валидация данных
 			if (pos==std::string::npos)
 			{
-				throw std::runtime_error("Invalid format at line " + std::to_string(lineNumber) + ": separator ';' not found");
+				const std::string msg = "Invalid format at line " + std::to_string(lineNumber) + ": separator ';' not found";
+				LOG(ERROR) << msg;
+				throw std::runtime_error(msg);
 			}
 			
 			//---Извлекаем data и rand_index
@@ -132,11 +137,15 @@ void ListSerializer::loadFromFile(List& list, const std::string& fileName) {
 			//---Валидация данных
 			if (data.size() > List::kMaxDataSize)
 			{
-				throw std::runtime_error("Data is to long at line " + std::to_string(lineNumber));
+				const std::string msg = "Data is to long at line " + std::to_string(lineNumber);
+				LOG(ERROR) << msg;
+				throw std::runtime_error(msg);
 			}
 			if (randIndexStr.empty())
 			{
-				throw std::runtime_error("Invalid rand index at line" + std::to_string(lineNumber));
+				const std::string msg = "Invalid rand index at line" + std::to_string(lineNumber);
+				LOG(ERROR) << msg;
+				throw std::runtime_error(msg);
 			}
 
 			//---Парсим rand-индекс
@@ -149,22 +158,30 @@ void ListSerializer::loadFromFile(List& list, const std::string& fileName) {
 			}
 			catch (const std::exception&)
 			{
-				throw std::runtime_error("Invalid rand index at line " + std::to_string(lineNumber));
+				const std::string msg = "Invalid rand index at line " + std::to_string(lineNumber);
+				LOG(ERROR) << msg;
+				throw std::runtime_error(msg);
 			}
 
 			//---Проверяем, что вся строка распаршена
 			if (parsedCount != randIndexStr.size())
 			{
-				throw std::runtime_error("Invalid index at line " + std::to_string(lineNumber));
+				const std::string msg = "Invalid index at line " + std::to_string(lineNumber);
+				LOG(ERROR) << msg;
+				throw std::runtime_error(msg);
 			}
 			//---Проверяем, что rand-индекс в допустимых пределах
 			if (randIndexLong < -1 || randIndexLong > static_cast<long long>(std::numeric_limits<int>::max()))
 			{
-				throw std::runtime_error("rand index is out of range at line " + std::to_string(lineNumber));
+				const std::string msg = "rand index is out of range at line " + std::to_string(lineNumber);
+				LOG(ERROR) << msg;
+				throw std::runtime_error(msg);
 			}
 			if (list.getCount() >= List::kNodeLimit)
 			{
-				throw std::runtime_error("Too many nodes is input file: maximum is 1'000'000");
+				const std::string msg = "Too many nodes is input file: maximum is 1'000'000";
+				LOG(ERROR) << msg;
+				throw std::runtime_error(msg);
 			}
 
 			//---Создаём новый узел с данными и добавляем его в список
@@ -186,7 +203,9 @@ void ListSerializer::loadFromFile(List& list, const std::string& fileName) {
 			}
 			if (randIndex < 0 || randIndex >= static_cast<int>(nodes.size())) 
 			{
-				throw std::runtime_error("rand index out of bounds for node " + std::to_string(i));
+				const std::string msg = "rand index out of bounds for node " + std::to_string(i);
+				LOG(ERROR) << msg;
+				throw std::runtime_error(msg);
 			}
 			nodes[i]->rand = nodes[randIndex];
 		}
@@ -194,10 +213,9 @@ void ListSerializer::loadFromFile(List& list, const std::string& fileName) {
 	catch (const std::exception& e)
 	{
 		list.clear();	//	Очищаем список при возникновении ошибки
-		throw std::runtime_error("Error while loading list from file: " + std::string(e.what()));
+		const std::string msg = "Error while loading list from file: " + std::string(e.what());
+		throw std::runtime_error(msg);
 	}
-
-
 }
 //------------------------------------------------
 //	Метод сериализует список в бинарный файл
@@ -209,7 +227,9 @@ void ListSerializer::serializeBinary(const List& list, const std::string& fileNa
 	std::ofstream out(fileName, std::ios::binary);
 	if (!out.is_open())
 	{
-		throw std::runtime_error("Failed to open output file: " + fileName);
+		const std::string msg = "Failed to open output file: " + fileName;
+		LOG(ERROR) << msg;
+		throw std::runtime_error(msg);
 	}
 	//---Собираем узлы списка в вектор для удобства доступа по индексу
 	std::vector<ListNode*> nodes;
@@ -238,7 +258,9 @@ void ListSerializer::serializeBinary(const List& list, const std::string& fileNa
 		//---Проверяем, что размер данных не превышает максимальный размер для uint32
 		if (node->data.size() > static_cast<std::size_t>(UINT32_MAX))
 		{
-			throw std::runtime_error("Node data is too large to serialize");
+			const std::string msg = "Node data is too large to serialize";
+			LOG(ERROR) << msg;
+			throw std::runtime_error(msg);
 		}
 
 		//---Записываем размер данных узла
@@ -251,7 +273,9 @@ void ListSerializer::serializeBinary(const List& list, const std::string& fileNa
 			out.write(node->data.data(), static_cast<std::streamsize>(node->data.size()));
 			if (!out)
 			{
-				throw std::runtime_error("Failed to write node data");
+				const std::string msg = "Failed to write node data";
+				LOG(ERROR) << msg;
+				throw std::runtime_error(msg);
 			}
 		}
 
@@ -262,7 +286,9 @@ void ListSerializer::serializeBinary(const List& list, const std::string& fileNa
 			const auto it = indexByPtr.find(node->rand);
 			if (it == indexByPtr.end())
 			{
-				throw std::runtime_error("rand points to a node outside the list");
+				const std::string msg = "rand points to a node outside the list";
+				LOG(ERROR) << msg;
+				throw std::runtime_error(msg);
 			}
 
 			randIndex = it->second;
@@ -282,7 +308,9 @@ void ListSerializer::deserializeBinary(List& list, const std::string& fileName) 
 	std::ifstream in(fileName, std::ios::binary);
 	if (!in.is_open())
 	{
-		throw std::runtime_error("Failed to open binary file: " + fileName);
+		const std::string msg = "Failed to open binary file: " + fileName;
+		LOG(ERROR) << msg;
+		throw std::runtime_error(msg);
 	}
 
 	//---Читаем количество узлов в списке(первые 8 байт количество узлов (uint64_t))
@@ -291,7 +319,9 @@ void ListSerializer::deserializeBinary(List& list, const std::string& fileName) 
 	//---Валидируем количество узлов
 	if (nodeCount > List::kNodeLimit)
 	{
-		throw std::runtime_error("Too many nodes in binary file");
+		const std::string msg = "Too many nodes in binary file";
+		LOG(ERROR) << msg;
+		throw std::runtime_error(msg);
 	}
 
 	//---Временные векторы для хранения указателей на узлы и их rand-индексов
@@ -309,7 +339,9 @@ void ListSerializer::deserializeBinary(List& list, const std::string& fileName) 
 			//---Проверяем, не превышает ли размер данных лимит
 			if (dataSize > List::kMaxDataSize)
 			{
-				throw std::runtime_error("Node data is too large at binary node " + std::to_string(i));
+				const std::string msg = "Node data is too large at binary node " + std::to_string(i);
+				LOG(ERROR) << msg;
+				throw std::runtime_error(msg);
 			}
 
 			//---Читаем данные узла
@@ -322,7 +354,9 @@ void ListSerializer::deserializeBinary(List& list, const std::string& fileName) 
 				in.read(data.data(), static_cast<std::streamsize>(dataSize));
 				if (!in)
 				{
-					throw std::runtime_error("Failed to read node data at binary node " + std::to_string(i));
+					const std::string msg = "Failed to read node data at binary node " + std::to_string(i);
+					LOG(ERROR) << msg;
+					throw std::runtime_error(msg);
 				}
 			}
 
@@ -350,7 +384,9 @@ void ListSerializer::deserializeBinary(List& list, const std::string& fileName) 
 			//---Проверяем, что индекс в допустимых пределах
 			if (randIndex < 0 || randIndex >= static_cast<std::int64_t>(nodes.size()))
 			{
-				throw std::runtime_error("rand index out of bounds for binary node " + std::to_string(i));
+				const std::string msg = "rand index out of bounds for binary node " + std::to_string(i);
+				LOG(ERROR) << msg;
+				throw std::runtime_error(msg);
 			}
 
 			//---Устанавливаем rand-указатель узла
@@ -360,6 +396,8 @@ void ListSerializer::deserializeBinary(List& list, const std::string& fileName) 
 	catch (const std::exception& e)
 	{
 		list.clear();	//	Очищаем список при возникновении ошибки
-		throw std::runtime_error("Error while loading list from binary file: " + std::string(e.what()));
+		const std::string msg = "Error while loading list from binary file: " + std::string(e.what());
+		LOG(ERROR) << msg;
+		throw std::runtime_error(msg);
 	}
 }

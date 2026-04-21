@@ -1,5 +1,6 @@
 #include "List.hpp"
 #include <stdexcept>
+#include <glog/logging.h>
 
 //------------------------------------------------
 //	Деструктор класса
@@ -47,7 +48,10 @@ std::size_t List::getCount() const noexcept{
 ListNode* List::pushBack(const std::string& data) {
 	
 	if (count >= kNodeLimit) {
-		throw std::runtime_error("List size exceeds 1,000,000 nodes");
+
+		const std::string msg = "List size exceeds 1,000,000 nodes";
+		LOG(ERROR) << msg;
+		throw std::runtime_error(msg);
 	}
 
 	//---Создаём новый узел
@@ -81,7 +85,9 @@ ListNode* List::pushBack(const std::string& data) {
 ListNode* List::pushBegin(const std::string& data) {
 
 	if (count >= kNodeLimit) {
-		throw std::runtime_error("List size exceeds 1,000,000 nodes");
+		const std::string msg = "List size exceeds 1,000,000 nodes";
+		LOG(ERROR) << msg;
+		throw std::runtime_error(msg);
 	}
 
 	//---Создаём новый узел
@@ -117,7 +123,9 @@ ListNode* List::pushBegin(const std::string& data) {
 ListNode* List::insertAfter(ListNode* node, const std::string& data) {
 
 	if (count >= kNodeLimit) {
-		throw std::runtime_error("List size exceeds 1,000,000 nodes");
+		const std::string msg = "List size exceeds 1,000,000 nodes";
+		LOG(ERROR) << msg;
+		throw std::runtime_error(msg);
 	}
 
 	//---Создаём новый узел
@@ -168,7 +176,9 @@ ListNode* List::insertAfter(ListNode* node, const std::string& data) {
 ListNode* List::insertBefore(ListNode* node, const std::string& data) {
 	
 	if (count >= kNodeLimit) {
-		throw std::runtime_error("List size exceeds 1,000,000 nodes");
+		const std::string msg = "List size exceeds 1,000,000 nodes";
+		LOG(ERROR) << msg;
+		throw std::runtime_error(msg);
 	}
 
 	//---Создаём новый узел

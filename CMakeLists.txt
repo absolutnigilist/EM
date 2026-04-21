@@ -8,6 +8,10 @@ endif()
 
 project(EM LANGUAGES CXX)
 
+if(WIN32)
+    add_compile_definitions(NOMINMAX WIN32_LEAN_AND_MEAN)
+endif()
+
 # ------------------------------------------------------------
 # Общие настройки проекта
 # ------------------------------------------------------------
