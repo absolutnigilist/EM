@@ -1,4 +1,4 @@
-#include "ListNode.hpp"
+п»ї#include "ListNode.hpp"
 #include "List.hpp"
 #include "ListSerializer.hpp"
 #include <iostream>
@@ -13,7 +13,7 @@
 #endif
 
 //------------------------------------------------
-//    Получить папку, где лежит exe
+//    РџРѕР»СѓС‡РёС‚СЊ РїР°РїРєСѓ, РіРґРµ Р»РµР¶РёС‚ exe
 //------------------------------------------------
 std::filesystem::path getExecutableDir()
 {
@@ -42,14 +42,14 @@ std::filesystem::path getExecutableDir()
 #endif
 }
 //------------------------------------------------
-//	Инициализация логирования в папке log рядом с exe
+//	РРЅРёС†РёР°Р»РёР·Р°С†РёСЏ Р»РѕРіРёСЂРѕРІР°РЅРёСЏ РІ РїР°РїРєРµ log СЂСЏРґРѕРј СЃ exe
 //------------------------------------------------
 inline void initLogging(const std::filesystem::path& logDir) {
 
 	std::error_code ec;
 	std::filesystem::create_directories(logDir, ec);
 
-	//---ВАЖНО: строки должны жить после выхода из функции (на всякий случай)
+	//---Р’РђР–РќРћ: СЃС‚СЂРѕРєРё РґРѕР»Р¶РЅС‹ Р¶РёС‚СЊ РїРѕСЃР»Рµ РІС‹С…РѕРґР° РёР· С„СѓРЅРєС†РёРё (РЅР° РІСЃСЏРєРёР№ СЃР»СѓС‡Р°Р№)
 	static std::string info, warning, error, fatal;
 
 	info = (logDir / "info").string();
@@ -71,21 +71,21 @@ int main(int argc, char** argv) {
 	(void)argc;
 	(void)argv;
 
-	//---Определяем пути
+	//---РћРїСЂРµРґРµР»СЏРµРј РїСѓС‚Рё
 	const std::filesystem::path exeDir = getExecutableDir();
 	const std::filesystem::path logDir = exeDir / "log";
 	
-	//---Инициализация логирования
+	//---РРЅРёС†РёР°Р»РёР·Р°С†РёСЏ Р»РѕРіРёСЂРѕРІР°РЅРёСЏ
 	initLogging(logDir);
 
 	try
 	{
-		//---Создаём пустой список, загружаем список из текстового файла "inlet.in" и сериализуем список в бинарный файл "output.out"
+		//---РЎРѕР·РґР°С‘Рј РїСѓСЃС‚РѕР№ СЃРїРёСЃРѕРє, Р·Р°РіСЂСѓР¶Р°РµРј СЃРїРёСЃРѕРє РёР· С‚РµРєСЃС‚РѕРІРѕРіРѕ С„Р°Р№Р»Р° "inlet.in" Рё СЃРµСЂРёР°Р»РёР·СѓРµРј СЃРїРёСЃРѕРє РІ Р±РёРЅР°СЂРЅС‹Р№ С„Р°Р№Р» "output.out"
 		List list;	
 		ListSerializer::loadFromFile(list, "inlet.in");
 		ListSerializer::serializeBinary(list, "output.out");
 
-		//---Создаём новый пустой список и десериализуем его из бинарного файла
+		//---РЎРѕР·РґР°С‘Рј РЅРѕРІС‹Р№ РїСѓСЃС‚РѕР№ СЃРїРёСЃРѕРє Рё РґРµСЃРµСЂРёР°Р»РёР·СѓРµРј РµРіРѕ РёР· Р±РёРЅР°СЂРЅРѕРіРѕ С„Р°Р№Р»Р°
 		List restored;
 		ListSerializer::deserializeBinary(restored, "output.out");
 		
